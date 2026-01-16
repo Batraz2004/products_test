@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProductSearchSortEnum;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,14 +19,9 @@ class ProductController extends Controller
         $rating     = $request->input('rating');
         $priceFrom  = $request->input('price_from', 0);
         $priceTo    = $request->input('price_to');
-        $sort       = match ($request->input('sort')) {
-            'price_asc'     => ['column' => 'price', 'sort_value' => 'asc'],
-            'price_desc'    => ['column' => 'price', 'sort_value' => 'desc'],
-            'rating_desc'   => ['column' => 'rating', 'sort_value' => 'desc'],
-            'rating_asc'    => ['column' => 'rating', 'sort_value' => 'asc'],
-            'newest'        => ['column' => 'crated_at', 'sort_value' => 'desc'],
-            'default'       => ['column' => 'id', 'sort_value' => 'desc']
-        };
+
+        $sort       = ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc()
+            ?? ProductSearchSortEnum::Newest->sortAssoc();
 
         $products = Product::query()
             ->where('category_id', $categoryId)
