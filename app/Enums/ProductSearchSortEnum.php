@@ -18,7 +18,7 @@ enum ProductSearchSortEnum: string
             self::PriceDesc     => ['column' => 'price',    'sort_value' => 'desc'],
             self::RatingDesc    => ['column' => 'rating',   'sort_value' => 'desc'],
             self::RatingAsc     => ['column' => 'rating',   'sort_value' => 'asc'],
-            self::Newest        => ['column' => 'crated_at', 'sort_value' => 'desc'],
+            self::Newest        => ['column' => 'created_at', 'sort_value' => 'desc'],
             'default'           => ['column' => 'id',       'sort_value' => 'desc']
         };
     }
