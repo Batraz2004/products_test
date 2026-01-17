@@ -18,19 +18,19 @@ class ProductController extends Controller
         $categoryId = $request->input('category_id');
         $query      = $request->input('q');
         $priceFrom  = $request->input('price_from', 0);
-
-        $sort       = ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc()
-            ?? ProductSearchSortEnum::Newest->sortAssoc();
+        $sort       = ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc();
 
         $products = Product::query()
             ->where('category_id', $categoryId)
             ->where('name', 'like', "%$query%")
             ->where('price', '>=', $priceFrom)
             ->when($request->has('rating'), function (Builder $query) use ($request) {
-                $query = $query->where('rating', $request->input('rating'));
+                $rating = $request->input('rating');
+                $query  = $query->where('rating', $rating);
             })
             ->when($request->has('price_to'), function (Builder $query) use ($request) {
-                $query = $query->where('price', '<=', $request->input('price_to'));
+                $priceTo = $request->input('price_to');
+                $query   = $query->where('price', '<=', $priceTo);
             })
             ->orderBy($sort['column'], $sort['sort_value'])
             ->paginate($perPage);
