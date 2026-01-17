@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ProductSearchSortEnum;
+use App\Http\Requests\ProductSearchRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,14 +12,12 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function search(Request $request): JsonResponse
+    public function search(ProductSearchRequest $request): JsonResponse
     {
-        $categoryId = $request->input('category_id');
         $perPage    = $request->input('per_page', 15);
+        $categoryId = $request->input('category_id');
         $query      = $request->input('q');
-        $rating     = $request->input('rating');
         $priceFrom  = $request->input('price_from', 0);
-        $priceTo    = $request->input('price_to');
 
         $sort       = ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc()
             ?? ProductSearchSortEnum::Newest->sortAssoc();
@@ -27,16 +26,11 @@ class ProductController extends Controller
             ->where('category_id', $categoryId)
             ->where('name', 'like', "%$query%")
             ->where('price', '>=', $priceFrom)
-            ->where(function (Builder $query) use ($rating, $priceTo) {
-                if (filled($priceTo)) {
-                    $query = $query->where('price', '<=', $priceTo);
-                }
-
-                if (filled($rating)) {
-                    $query = $query->where('rating', $rating);
-                }
-
-                return $query;
+            ->when($request->has('rating'), function (Builder $query) use ($request) {
+                $query = $query->where('rating', $request->input('rating'));
+            })
+            ->when($request->has('price_to'), function (Builder $query) use ($request) {
+                $query = $query->where('price', '<=', $request->input('price_to'));
             })
             ->orderBy($sort['column'], $sort['sort_value'])
             ->paginate($perPage);
