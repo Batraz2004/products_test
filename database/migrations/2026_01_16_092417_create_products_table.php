@@ -13,6 +13,17 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name')->index();
+            $table->decimal('price')->default(0);
+            $table->boolean('in_stock')->default(true);
+            $table->float('rating');
+
+            $table->foreignId('category_id')
+                ->constrained()
+                ->cascadeOnDelete()
+                ->cascadeOnUpdate();
+
             $table->timestamps();
         });
     }
