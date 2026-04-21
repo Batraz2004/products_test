@@ -20,7 +20,7 @@ class ProductController extends Controller
             query: $request->input('q'),
             sort: ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc(),
             rating: $request->input('rating'),
-            priceFrom: $request->input('price_from'),
+            priceFrom: $request->input('price_from', 0),
             priceTo: $request->input('price_to'),
             perPage: (int)$request->input('per_page', 15),
         );
