@@ -11,10 +11,8 @@ use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    public function searchPagination(ProductSearchRequest $request): JsonResponse
+    public function searchPagination(ProductSearchRequest $request, ProductServiceInterface $productService): JsonResponse
     {
-        $productService = app(ProductServiceInterface::class);
-
         $dto = new ProductSearchPaginationDto(
             categoryId: $request->input('category_id'),
             query: $request->input('q'),
