@@ -19,9 +19,9 @@ class ProductController extends Controller
             categoryId: $request->input('category_id'),
             query: $request->input('q'),
             sort: ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc(),
-            rating: (float)$request->input('rating'),
-            priceFrom: (float)$request->input('price_from'),
-            priceTo: (float)$request->input('price_to'),
+            rating: $request->input('rating'),
+            priceFrom: $request->input('price_from'),
+            priceTo: $request->input('price_to'),
             perPage: (int)$request->input('per_page', 15),
         );
 
