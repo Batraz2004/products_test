@@ -2,10 +2,10 @@
 
 namespace App\Services\ProductService;
 
-use App\Http\Requests\ProductSearchRequest;
+use App\DTO\ProductSearchPaginationDto;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 interface ProductServiceInterface
 {
-    public function searchPagination(ProductSearchRequest $request): LengthAwarePaginator;
+    public function searchPagination(ProductSearchPaginationDto $dto): LengthAwarePaginator;
 }
