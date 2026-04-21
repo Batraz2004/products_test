@@ -16,11 +16,17 @@ class ProductServiceEloquent implements ProductServiceInterface
             ->where('category_id', $dto->categoryId)
             ->where('name', 'like', "%$dto->query%")
             ->where('price', '>=', $dto->priceFrom)
-            ->where('rating', $dto->rating)
-            ->where('price', '<=', $dto->priceTo)
+            ->when($dto->rating, function (Builder $query) use ($dto) {
+                $rating = $dto->rating;
+                $query  = $query->where('rating', $rating);
+            })
+            ->when($dto->priceTo, function (Builder $query) use ($dto) {
+                $priceTo = $dto->priceTo;
+                $query   = $query->where('price', '<=', $priceTo);
+            })
             ->orderBy($dto->sort['column'], $dto->sort['sort_value'])
             ->paginate($dto->perPage);
 
-            return $products;
+        return $products;
     }
 }

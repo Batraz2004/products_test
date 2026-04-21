@@ -2,8 +2,6 @@
 
 namespace App\DTO;
 
-use App\Enums\ProductSearchSortEnum;
-
 readonly class ProductSearchPaginationDto
 {
     public function __construct(
