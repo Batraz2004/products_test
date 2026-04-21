@@ -11,7 +11,9 @@ use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
-    public function searchPagination(ProductSearchRequest $request, ProductServiceInterface $productService): JsonResponse
+    public function __construct(private ProductServiceInterface $productService) {}
+
+    public function searchPagination(ProductSearchRequest $request): JsonResponse
     {
         $dto = new ProductSearchPaginationDto(
             categoryId: $request->input('category_id'),
@@ -23,7 +25,7 @@ class ProductController extends Controller
             perPage: (int)$request->input('per_page', 15),
         );
 
-        $products = $productService->searchPagination($dto);
+        $products = $this->productService->searchPagination($dto);
 
         return response()->json([
             'data' => ProductResource::collection($products)->resource,
