@@ -26,7 +26,7 @@ class ProductSearchRequest extends FormRequest
         return [
             'category_id' => ['required', 'exists:categories,id'],
             'q'           => ['nullable'],
-            'sort'        => ['nullable', Rule::in(ProductSearchSortEnum::cases())],
+            'sort'        => ['string', Rule::in(ProductSearchSortEnum::cases())],
             'rating'      => ['numeric', 'min:0', 'max:5'],
             'price_from'  => ['numeric', 'min:0'],
             'price_to'    => ['numeric'],

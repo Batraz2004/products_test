@@ -2,38 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\ProductSearchPaginationDto;
 use App\Enums\ProductSearchSortEnum;
 use App\Http\Requests\ProductSearchRequest;
 use App\Http\Resources\ProductResource;
-use App\Models\Product;
-use Illuminate\Database\Eloquent\Builder;
+use App\Services\ProductService\ProductServiceInterface;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function search(ProductSearchRequest $request): JsonResponse
+    public function searchPagination(ProductSearchRequest $request): JsonResponse
     {
-        $perPage    = $request->input('per_page', 15);
-        $categoryId = $request->input('category_id');
-        $query      = $request->input('q');
-        $priceFrom  = $request->input('price_from', 0);
-        $sort       = ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc();
+        $productService = app(ProductServiceInterface::class);
 
-        $products = Product::query()
-            ->where('category_id', $categoryId)
-            ->where('name', 'like', "%$query%")
-            ->where('price', '>=', $priceFrom)
-            ->when($request->has('rating'), function (Builder $query) use ($request) {
-                $rating = $request->input('rating');
-                $query  = $query->where('rating', $rating);
-            })
-            ->when($request->has('price_to'), function (Builder $query) use ($request) {
-                $priceTo = $request->input('price_to');
-                $query   = $query->where('price', '<=', $priceTo);
-            })
-            ->orderBy($sort['column'], $sort['sort_value'])
-            ->paginate($perPage);
+        $dto = new ProductSearchPaginationDto(
+            categoryId: $request->input('category_id'),
+            query: $request->input('q'),
+            sort: ProductSearchSortEnum::tryFrom($request->input('sort', 'newest'))?->sortAssoc(),
+            rating: (float)$request->input('rating'),
+            priceFrom: (float)$request->input('price_from'),
+            priceTo: (float)$request->input('price_to'),
+            perPage: (int)$request->input('per_page', 15),
+        );
+
+        $products = $productService->searchPagination($dto);
 
         return response()->json([
             'data' => ProductResource::collection($products)->resource,
